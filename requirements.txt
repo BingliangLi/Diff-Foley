@@ -24,7 +24,7 @@ dash-table==5.0.0
 datasets==2.12.0
 debugpy==1.6.7
 decorator==4.4.2
-deform-conv==0.0.0
+# deform-conv==0.0.0
 diffusers==0.20.2
 dill==0.3.6
 docker-pycreds==0.4.0
