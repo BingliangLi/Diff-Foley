@@ -112,6 +112,9 @@ def generate_audio_sample(video_path, save_path):
     tmp_path = "./generate_samples/temp_folder"
     start_second = 0  # Video start second
     truncate_second = 8.2  # Video end = start_second + truncate_second
+    
+    video_filename = os.path.basename(video_path)
+    video_filename_no_ext = os.path.splitext(video_filename)[0]
 
     # Extract Video CAVP Features & New Video Path:
     cavp_feats, new_video_path = extract_cavp(video_path, start_second, truncate_second, tmp_path=tmp_path)
@@ -139,7 +142,7 @@ def generate_audio_sample(video_path, save_path):
     window_num = feat_len // truncate_len
 
     audio_list = []  # [sample_list1, sample_list2, sample_list3 ....]
-    for i in tqdm(range(window_num), desc="Window:"):
+    for i in range(window_num):
         start, end = i * truncate_len, (i+1) * truncate_len
 
         # 1). Get Video Condition Embed:
@@ -178,7 +181,7 @@ def generate_audio_sample(video_path, save_path):
 
         # 5). Spectrogram -> Audio:  (Griffin-Lim Algorithm)
         sample_list = []  # [sample1, sample2, ....]
-        for k in tqdm(range(audio_samples.shape[0]), desc="current samples:"):
+        for k in range(audio_samples.shape[0]):
             sample = inverse_op(audio_samples[k])
             sample_list.append(sample)
         audio_list.append(sample_list)
@@ -191,16 +194,26 @@ def generate_audio_sample(video_path, save_path):
             current_audio_list.append(audio_list[k][i])
         current_audio = np.concatenate(current_audio_list, 0)
         print(current_audio.shape)
-        sf.write(os.path.join(save_path, "sample_{}_diff.wav").format(i), current_audio, 16000)
-        path_list.append(os.path.join(save_path, "sample_{}_diff.wav").format(i))
+        sf.write(os.path.join(save_path, "{}.wav").format(video_filename_no_ext), current_audio, 16000)
+        path_list.append(os.path.join(save_path, "{}.wav").format(video_filename_no_ext))
     print("Gen Success !!")
 
+def get_mp4_file_list(path_to_folder):
+    file_list = []
+    for file in os.listdir(path_to_folder):
+        if file.endswith(".mp4"):
+            file_list.append(os.path.join(path_to_folder, file))
+    return file_list
 
-
+def generate_samples(path_to_folder, save_path):
+    mp4_file_list = get_mp4_file_list(path_to_folder)
+    for video_path in tqdm(mp4_file_list):
+        generate_audio_sample(video_path, save_path)
+        
 if __name__ == "__main__":
-    video_path = "./demo_video/gun.mp4"
-    save_path = "./generate_samples"
-    generate_audio_sample(video_path, save_path)
+    video_path = "./demo_video"
+    save_path = "./generated_audio"
+    generate_samples(video_path, save_path)
 
 
 
