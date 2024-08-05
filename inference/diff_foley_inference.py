@@ -205,7 +205,11 @@ def get_mp4_file_list(path_to_folder, test_list):
 def generate_samples(path_to_folder, save_path, test_list):
     mp4_file_list = get_mp4_file_list(path_to_folder, test_list)
     for video_path in tqdm(mp4_file_list):
-        generate_audio_sample(video_path, save_path)
+        try:
+            generate_audio_sample(video_path, save_path)
+        except Exception as e:
+            print(e)
+            print("Error in generating samples for: ", video_path)
         
 if __name__ == "__main__":
     video_path = "/workspace/data3/VGGSound/video/"

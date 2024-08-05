@@ -87,13 +87,11 @@ class Extract_CAVP_Features(torch.nn.Module):
         self.tmp_path = tmp_path
 
         # Initalize Stage1 CAVP model:
-        print("Initalize Stage1 CAVP Model")
         config = OmegaConf.load(config_path)
         self.stage1_model = instantiate_from_config(config.model).to(device)
 
         # Loading Model from:
         assert ckpt_path is not None
-        print("Loading Stage1 CAVP Model from: {}".format(ckpt_path))
         self.init_first_from_ckpt(ckpt_path)
         self.stage1_model.eval()
         
@@ -125,8 +123,6 @@ class Extract_CAVP_Features(torch.nn.Module):
     def forward(self, video_path, start_second=None, truncate_second=None, tmp_path="./tmp_folder"):
         self.tmp_path = tmp_path
         
-        print("video_path", video_path)
-        print("truncate second: ", truncate_second)
         # Load the video, change fps:
         video_path_low_fps = reencode_video_with_diff_fps(video_path, self.tmp_path, self.fps, start_second, truncate_second)
         video_path_high_fps = reencode_video_with_diff_fps(video_path, self.tmp_path, 21.5, start_second, truncate_second)
@@ -141,7 +137,6 @@ class Extract_CAVP_Features(torch.nn.Module):
         i = 0
         while cap.isOpened():
             i += 1
-            pbar.set_description("Processing Frames: {} Total: {}".format(i, cap.get(7)))
             frames_exists, rgb = cap.read()
             
             if first_frame:
