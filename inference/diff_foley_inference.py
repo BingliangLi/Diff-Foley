@@ -77,6 +77,18 @@ config = OmegaConf.load(ldm_config_path)
 # Loading LDM:
 latent_diffusion_model = load_model_from_config(config, ldm_ckpt_path)
 
+def seed_everything(seed):
+    import random, os
+    import numpy as np
+    import torch
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
+seed_everything(21)
 
 # ### 3. Data Preprocess
 
@@ -96,19 +108,6 @@ cavp_feats, new_video_path = extract_cavp(video_path, start_second, truncate_sec
 
 # In[21]:
 
-
-def seed_everything(seed):
-    import random, os
-    import numpy as np
-    import torch
-    random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = True
-seed_everything(21)
 
 
 # ### 4. Diff-Foley Generation:
@@ -134,7 +133,7 @@ if use_double_guidance:
 
 from demo_util import inverse_op
 
-sample_num = 4
+sample_num = 1
 
 # Inference Param:
 cfg_scale = 4.5      # Classifier-Free Guidance Scale
@@ -212,6 +211,7 @@ import subprocess
 src_video_path = new_video_path
 for i in range(sample_num):
     gen_audio_path = path_list[i]
+    breakpoint()
     # out_path = os.path.join(save_path, "output_{}.mp4".format(i))
     out_audio_path = os.path.join(save_path, "output_audio_{}.wav".format(i))
     # cmd = ["ffmpeg" ,"-i" ,src_video_path,"-i" , gen_audio_path ,"-c:v" ,"copy" ,"-c:a" ,"aac" ,"-strict" ,"experimental", out_path]
