@@ -87,18 +87,6 @@ latent_diffusion_model = load_model_from_config(config, ldm_ckpt_path)
 video_path = "./demo_videos/gun.mp4"
 save_path = "./generate_samples/gun"
 tmp_path = "./generate_samples/temp_folder" 
-
-## Sample2:
-# video_path = "./demo_videos/drum.mp4"
-# save_path = "./generate_samples/drum"
-# tmp_path = "./generate_samples/temp_folder" 
-
-## Sample3:
-# video_path = "./demo_videos/car.mp4"
-# save_path = "./generate_samples/car"
-# tmp_path = "./generate_samples/temp_folder" 
-
-
 start_second = 0              # Video start second
 truncate_second = 8.2         # Video end = start_second + truncate_second
 
@@ -219,22 +207,18 @@ for i in range(sample_num):      # sample_num
 print("Gen Success !!")
 
 
-# In[25]:
-
-
 # Concat The Video and Sound:
 import subprocess
 src_video_path = new_video_path
 for i in range(sample_num):
     gen_audio_path = path_list[i]
-    out_path = os.path.join(save_path, "output_{}.mp4".format(i))
-    cmd = ["ffmpeg" ,"-i" ,src_video_path,"-i" , gen_audio_path ,"-c:v" ,"copy" ,"-c:a" ,"aac" ,"-strict" ,"experimental", out_path]
-    # cmd = ["ffmpeg" ,"-i" ,src_video_path,"-i" , gen_audio_path ,"-c:v" ,"copy" ,"-c:a" ,"mp3" ,"-strict" ,"experimental", out_path]
+    # out_path = os.path.join(save_path, "output_{}.mp4".format(i))
+    out_audio_path = os.path.join(save_path, "output_audio_{}.wav".format(i))
+    # cmd = ["ffmpeg" ,"-i" ,src_video_path,"-i" , gen_audio_path ,"-c:v" ,"copy" ,"-c:a" ,"aac" ,"-strict" ,"experimental", out_path]
+    cmd = ["ffmpeg" ,"-i" , gen_audio_path , out_audio_path]
     subprocess.check_call(cmd)
 print("Gen Success !!")
 
-
-# In[ ]:
 
 
 
