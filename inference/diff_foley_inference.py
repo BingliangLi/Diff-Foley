@@ -198,7 +198,7 @@ def generate_audio_sample(video_path, save_path):
 def get_mp4_file_list(path_to_folder, test_list):
     file_list = []
     for file in os.listdir(path_to_folder):
-        if file.endswith(".mp4") and os.path.basename(video_path) in test_list:
+        if file.endswith(".mp4") and os.path.basename(file) in test_list:
             file_list.append(os.path.join(path_to_folder, file))
     return file_list
 
