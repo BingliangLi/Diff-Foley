@@ -211,7 +211,7 @@ def generate_samples(path_to_folder, save_path):
         generate_audio_sample(video_path, save_path)
         
 if __name__ == "__main__":
-    video_path = "./demo_video"
+    video_path = "./demo_videos"
     save_path = "./generated_audio"
     generate_samples(video_path, save_path)
 
