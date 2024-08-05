@@ -14,6 +14,7 @@ import librosa
 import soundfile as sf
 from tqdm import tqdm
 
+import pandas as pd
 import sys
 sys.path.append("/".join(os.getcwd().split("/")[:-1]))
 from diff_foley.util import instantiate_from_config
@@ -134,7 +135,6 @@ def generate_audio_sample(video_path, save_path):
 
     # Video CAVP Features:
     video_feat = torch.from_numpy(cavp_feats).unsqueeze(0).repeat(sample_num, 1, 1).to(device)
-    print(video_feat.shape)
 
     # Truncate the Video Cond:
     feat_len = video_feat.shape[1]
@@ -152,7 +152,6 @@ def generate_audio_sample(video_path, save_path):
         uncond_cond = torch.zeros(embed_cond_feat.shape).to(device)
 
         # 3). Diffusion Sampling:
-        print("Using Double Guidance: {}".format(use_double_guidance))
         if use_double_guidance:
             audio_samples, _ = latent_diffusion_model.sample_log_with_classifier_diff_sampler(
                 embed_cond_feat,
@@ -193,27 +192,27 @@ def generate_audio_sample(video_path, save_path):
         for k in range(window_num):
             current_audio_list.append(audio_list[k][i])
         current_audio = np.concatenate(current_audio_list, 0)
-        print(current_audio.shape)
         sf.write(os.path.join(save_path, "{}.wav").format(video_filename_no_ext), current_audio, 16000)
         path_list.append(os.path.join(save_path, "{}.wav").format(video_filename_no_ext))
-    print("Gen Success !!")
 
-def get_mp4_file_list(path_to_folder):
+def get_mp4_file_list(path_to_folder, test_list):
     file_list = []
     for file in os.listdir(path_to_folder):
-        if file.endswith(".mp4"):
+        if file.endswith(".mp4") and os.path.basename(video_path) in test_list:
             file_list.append(os.path.join(path_to_folder, file))
     return file_list
 
-def generate_samples(path_to_folder, save_path):
-    mp4_file_list = get_mp4_file_list(path_to_folder)
+def generate_samples(path_to_folder, save_path, test_list):
+    mp4_file_list = get_mp4_file_list(path_to_folder, test_list)
     for video_path in tqdm(mp4_file_list):
         generate_audio_sample(video_path, save_path)
         
 if __name__ == "__main__":
-    video_path = "./demo_videos"
-    save_path = "./generated_audio"
-    generate_samples(video_path, save_path)
+    video_path = "/workspace/data3/VGGSound/video/"
+    save_path = "/workspace/data3/VGGSound/diff_foley_generated_test/"
+    test = pd.read_csv("test.csv", header=None)
+    test_list = test[0].tolist()
+    generate_samples(video_path, save_path, test_list)
 
 
 
