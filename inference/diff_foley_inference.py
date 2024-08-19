@@ -217,8 +217,8 @@ def generate_samples(path_to_folder, save_path, test_list):
             print("Error in generating samples for: ", video_path)
         
 if __name__ == "__main__":
-    video_path = "/workspace/data3/VGGSound/video/"
-    save_path = "/workspace/data3/VGGSound/diff_foley_generated_test_2/"
+    video_path = "/workspace/mnt/mm_data/libingliang/VGGSound/video_test"
+    save_path = "/workspace/mnt/mm_data/libingliang/VGGSound/diff_foley_generated_test_2/"
     test = pd.read_csv("test.csv", header=None)
     test_list = test[0].tolist()
     generate_samples(video_path, save_path, test_list)
