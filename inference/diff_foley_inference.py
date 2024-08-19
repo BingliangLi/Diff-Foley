@@ -19,6 +19,7 @@ import sys
 sys.path.append("/".join(os.getcwd().split("/")[:-1]))
 from diff_foley.util import instantiate_from_config
 
+import time
 
 # ### 1. Loading Stage1 CAVP Model:
 
@@ -140,7 +141,8 @@ def generate_audio_sample(video_path, save_path):
     feat_len = video_feat.shape[1]
     truncate_len = 32
     window_num = feat_len // truncate_len
-
+    total_time = 0
+    count = 0
     audio_list = []  # [sample_list1, sample_list2, sample_list3 ....]
     for i in range(window_num):
         start, end = i * truncate_len, (i+1) * truncate_len
@@ -150,7 +152,7 @@ def generate_audio_sample(video_path, save_path):
 
         # 2). CFG unconditional Embedding:
         uncond_cond = torch.zeros(embed_cond_feat.shape).to(device)
-
+        start_time = time.time()
         # 3). Diffusion Sampling:
         if use_double_guidance:
             audio_samples, _ = latent_diffusion_model.sample_log_with_classifier_diff_sampler(
@@ -173,7 +175,10 @@ def generate_audio_sample(video_path, save_path):
                 unconditional_guidance_scale=cfg_scale,
                 unconditional_conditioning=uncond_cond
             )  # Classifier-Free Guidance
-
+        end_time = time.time()
+        total_time += end_time - start_time
+        count += 1
+        print("Average Time: ", total_time / count)
         # 4). Decode Latent:
         audio_samples = latent_diffusion_model.decode_first_stage(audio_samples)
         audio_samples = audio_samples[:, 0, :, :].detach().cpu().numpy()
@@ -213,7 +218,7 @@ def generate_samples(path_to_folder, save_path, test_list):
         
 if __name__ == "__main__":
     video_path = "/workspace/data3/VGGSound/video/"
-    save_path = "/workspace/data3/VGGSound/diff_foley_generated_test/"
+    save_path = "/workspace/data3/VGGSound/diff_foley_generated_test_2/"
     test = pd.read_csv("test.csv", header=None)
     test_list = test[0].tolist()
     generate_samples(video_path, save_path, test_list)
